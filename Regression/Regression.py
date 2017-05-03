@@ -37,8 +37,9 @@ clf.fit(X_train, y_train)
 with open('linearregression.pickle', 'wb') as f:
     pickle.dump(clf, f)
 
-pickle_in = open('linearregression.pickle', 'rb')
-clf = pickle.load(pickle_in)
+# !read data model from pickle
+# pickle_in = open('linearregression.pickle', 'rb')
+# clf = pickle.load(pickle_in)
 
 confidence = clf.score(X_test, y_test)
 
