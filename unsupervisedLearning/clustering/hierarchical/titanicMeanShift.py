@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.cluster import MeanShift
 from sklearn import preprocessing
 import pandas as pd
-import matplotlib.pyplot as plt
 
 '''
 Pclass Passenger Class (1 = 1st; 2 = 2nd; 3 = 3rd)
@@ -73,7 +72,7 @@ clf.fit(X)
 labels = clf.labels_
 cluster_centers = clf.cluster_centers_
 
-original_df['cluster_group']=np.nan
+original_df['cluster_group'] = np.nan
 
 for i in range(len(X)):
     original_df['cluster_group'].iloc[i] = labels[i]
