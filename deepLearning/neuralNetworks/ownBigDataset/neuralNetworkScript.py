@@ -46,10 +46,10 @@ tf_log = 'dataFiles/tf.log'
 
 def train_neural_network(x):
     prediction = neural_network_model(x)
-    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(prediction, y))
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=prediction, labels=y))
     optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
     with tf.Session() as sess:
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
         try:
             epoch = int(open(tf_log, 'r').read().split('\n')[-2]) + 1
             print('STARTING:', epoch)
@@ -59,53 +59,53 @@ def train_neural_network(x):
         while epoch <= hm_epochs:
             if epoch != 1:
                 saver.restore(sess, "dataFiles/model.ckpt")
-            epoch_loss = 1
-            with open('dataFiles/lexicon.pickle', 'rb') as f:
-                lexicon = pickle.load(f)
-            with open('dataFiles/train_set_shuffled.csv', buffering=20000, encoding='latin-1') as f:
-                batch_x = []
-                batch_y = []
-                batches_run = 0
-                for line in f:
-                    label = line.split(':::')[0]
-                    tweet = line.split(':::')[1]
-                    current_words = word_tokenize(tweet.lower())
-                    current_words = [lemmatizer.lemmatize(i) for i in current_words]
+        epoch_loss = 1
+        with open('dataFiles/lexicon.pickle', 'rb') as f:
+            lexicon = pickle.load(f)
+        with open('dataFiles/train_set_shuffled.csv', buffering=20000, encoding='latin-1') as f:
+            batch_x = []
+            batch_y = []
+            batches_run = 0
+            for line in f:
+                label = line.split(':::')[0]
+                tweet = line.split(':::')[1]
+                current_words = word_tokenize(tweet.lower())
+                current_words = [lemmatizer.lemmatize(i) for i in current_words]
 
-                    features = np.zeros(len(lexicon))
+                features = np.zeros(len(lexicon))
 
-                    for word in current_words:
-                        if word.lower() in lexicon:
-                            index_value = lexicon.index(word.lower())
-                            # OR DO +=1, test both
-                            features[index_value] += 1
-                    line_x = list(features)
-                    line_y = eval(label)
-                    batch_x.append(line_x)
-                    batch_y.append(line_y)
-                    if len(batch_x) >= batch_size:
-                        _, c = sess.run([optimizer, cost], feed_dict={x: np.array(batch_x),
-                                                                      y: np.array(batch_y)})
-                        epoch_loss += c
-                        batch_x = []
-                        batch_y = []
-                        batches_run += 1
-                        print('Batch run:', batches_run, '/', total_batches, '| Epoch:', epoch, '| Batch Loss:', c, )
+                for word in current_words:
+                    if word.lower() in lexicon:
+                        index_value = lexicon.index(word.lower())
+                        # OR DO +=1, test both
+                        features[index_value] += 1
+                line_x = list(features)
+                line_y = eval(label)
+                batch_x.append(line_x)
+                batch_y.append(line_y)
+                if len(batch_x) >= batch_size:
+                    _, c = sess.run([optimizer, cost], feed_dict={x: np.array(batch_x),
+                                                                  y: np.array(batch_y)})
+                    epoch_loss += c
+                    batch_x = []
+                    batch_y = []
+                    batches_run += 1
+                    print('Batch run:', batches_run, '/', total_batches, '| Epoch:', epoch, '| Batch Loss:', c, )
 
-            saver.save(sess, "dataFiles/model.ckpt")
-            print('Epoch', epoch, 'completed out of', hm_epochs, 'loss:', epoch_loss)
-            with open(tf_log, 'a') as f:
-                f.write(str(epoch) + '\n')
-            epoch += 1
+        saver.save(sess, "dataFiles/model.ckpt")
+        print('Epoch', epoch, 'completed out of', hm_epochs, 'loss:', epoch_loss)
+        with open(tf_log, 'a') as f:
+            f.write(str(epoch) + '\n')
+        epoch += 1
 
 
-#train_neural_network(x)
+train_neural_network(x)
 
 
 def test_neural_network():
     prediction = neural_network_model(x)
     with tf.Session() as sess:
-        sess.run(tf.initialize_all_variables())
+        sess.run(tf.global_variables_initializer())
 
         saver.restore(sess, "dataFiles/model.ckpt")
 

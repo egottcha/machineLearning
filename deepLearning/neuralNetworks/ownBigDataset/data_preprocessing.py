@@ -19,7 +19,7 @@ tweet
 
 def init_process(fin, fout):
     outfile = open(fout, 'a')
-    with open(fin, buffering=200000, encoding='latin-1') as f:
+    with open(fin, buffering=200000, encoding='utf-8') as f:
         try:
             for line in f:
                 line = line.replace('"', '')
@@ -43,7 +43,7 @@ init_process('dataFiles/testdata.manual.2009.06.14.csv', 'dataFiles/test_set.csv
 
 def create_lexicon(fin):
     lexicon = []
-    with open(fin, 'r', buffering=100000, encoding='latin-1') as f:
+    with open(fin, 'r', buffering=100000, encoding='utf-8') as f:
         try:
             counter = 1
             content = ''
@@ -71,7 +71,7 @@ def convert_to_vec(fin, fout, lexicon_pickle):
     with open(lexicon_pickle, 'rb') as f:
         lexicon = pickle.load(f)
     outfile = open(fout, 'a')
-    with open(fin, buffering=20000, encoding='latin-1') as f:
+    with open(fin, buffering=20000, encoding='utf-8') as f:
         counter = 0
         for line in f:
             counter += 1
